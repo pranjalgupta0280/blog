@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pranjalgupta0280/blog.git"
+  },
+  "keywords": [
+    "backend"
+  ],
+  "author": "Pranjal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pranjalgupta0280/blog/issues"
+  },
+  "homepage": "https://github.com/pranjalgupta0280/blog#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
