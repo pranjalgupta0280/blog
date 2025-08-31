@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import { Box, TextField, Button, styled, Typography } from '@mui/material';
-import { API } from '../services/api';
+import { API } from '../../services/api';
+import { DataContext } from '../../context/DataProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Component = styled(Box)`
     width: 400px;
@@ -64,13 +66,15 @@ const loginInitialValues = {
     password: ''
 };
 
-const Login = () => {
+const Login = ({isUserAuthenticated}) => {
     const imageURL = "https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
     
     const [account, toggleAccount] = useState('login');
     const [signup, setSignup] = useState(signupInitialValues);
     const [login, setLogin] = useState(loginInitialValues);
     const [error, setError] = useState('');
+    const {setAccount}=useContext(DataContext);
+    const navigate=useNavigate();
 
     const toggleView = () => {
         account === 'signup' ? toggleAccount('login') : toggleAccount('signup');
@@ -105,9 +109,13 @@ const Login = () => {
             const response = await API.userLogin(login);
             if (response.isSuccess) {
                 setError('');
-                setLogin(loginInitialValues);
-                // TODO: Handle successful login (e.g., save session, redirect user)
-                console.log('Login successful!', response.data);
+                  sessionStorage.setItem('accessToken', `Bearer ${response.data.accessToken}`);
+            sessionStorage.setItem('refreshToken', `Bearer ${response.data.refreshToken}`);
+
+             setAccount({ name: response.data.name, username: response.data.username });
+            navigate('/');
+            isUserAuthenticated(true);
+            navigate('/');
             }
         } catch (error) {
             if (error.isError) {
