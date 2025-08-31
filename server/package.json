@@ -21,7 +21,13 @@
   "homepage": "https://github.com/pranjalgupta0280/blog#readme",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
