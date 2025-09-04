@@ -24,5 +24,6 @@ export const API_NOTIFICATION_MESSAGES = {
 // You will need to add the login endpoint here for the login functionality to work.
 export const SERVICE_URLS = {
     userSignup: { url: '/signup', method: 'POST' },
-    userLogin: { url: '/login', method: 'POST' } // ADD THIS LINE
+    userLogin: { url: '/login', method: 'POST' },  
+    uploadFile: { url: '/file/upload', method: 'POST' }, 
 };

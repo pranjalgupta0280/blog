@@ -13,6 +13,11 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     function(config) {
+        // CRITICAL FIX: Remove Content-Type header for FormData uploads
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+            // Let the browser set the correct Content-Type with boundary
+        }
         return config;
     },
     function(error) {
@@ -22,11 +27,9 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
     function(response) {
-        // This function will only be triggered for successful responses (status code 2xx)
         return processResponse(response);
     },
     function(error) {
-        // This function will be triggered for any error responses
         return Promise.reject(ProcessError(error));
     }
 );
@@ -45,18 +48,13 @@ const processResponse = (response) => {
  */
 const ProcessError = (error) => {
     if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         console.error("ERROR IN RESPONSE: ", error.response);
         return {
             isError: true,
-            // Prioritize the actual error message from the backend server.
-            // If it doesn't exist, fall back to a generic message from config.js.
             msg: error.response?.data?.msg || API_NOTIFICATION_MESSAGES.responseFailure.message,
             code: error.response?.status
         };
     } else if (error.request) {
-        // The request was made but no response was received
         console.error("ERROR IN REQUEST: ", error.request);
         return {
             isError: true,
@@ -64,7 +62,6 @@ const ProcessError = (error) => {
             code: ""
         };
     } else {
-        // Something happened in setting up the request that triggered an Error
         console.error("ERROR IN CONFIG: ", error.message);
         return {
             isError: true,
@@ -76,7 +73,7 @@ const ProcessError = (error) => {
 
 const API = {};
 
-// This loop dynamically creates API functions based on your SERVICE_URLS config
+// Dynamic API generation for regular requests
 for (const [key, value] of Object.entries(SERVICE_URLS)) {
     API[key] = (body) =>
         axiosInstance({
@@ -84,9 +81,38 @@ for (const [key, value] of Object.entries(SERVICE_URLS)) {
             url: value.url,
             data: body,
             responseType: value.responseType,
-            // You can add headers for authentication here in the future
-            // headers: { authorization: getAccessToken() }
         });
 }
+
+// ADDED: Special file upload function
+API.uploadFile = async (formData) => {
+    try {
+        console.log('=== API SERVICE DEBUG ===');
+        console.log('Starting file upload...');
+        
+        // Debug FormData contents
+        for (let [key, value] of formData.entries()) {
+            console.log('API FormData entry:', key, value instanceof File ? `File: ${value.name}` : value);
+        }
+        
+        const response = await axiosInstance({
+            method: 'POST',
+            url: '/file/upload',
+            data: formData,
+            timeout: 60000, // Increased timeout for file uploads
+            // Don't set Content-Type - let axios handle it automatically for FormData
+        });
+        
+        console.log('Upload successful:', response);
+        return response;
+        
+    } catch (error) {
+        console.error('=== API UPLOAD ERROR ===');
+        console.error('Error:', error.message);
+        console.error('Response data:', error.response?.data);
+        console.error('Response status:', error.response?.status);
+        throw error;
+    }
+};
 
 export { API };
