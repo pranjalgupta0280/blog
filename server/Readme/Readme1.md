@@ -47,9 +47,6 @@ A full-stack blog application where users can register, log in, and share their 
 
 ---
 
-## 💡 Notes
-- Keep components reusable for scalability
-- Focus on clean UI for better user experience
-- Plan for role-based features (admin/users) later
+
 
 ---
